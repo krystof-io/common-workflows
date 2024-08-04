@@ -3,14 +3,14 @@ on:
   workflow_call:
 jobs:
   build:
-    uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
+    uses: krystof-io/common-workflows/.github/workflows/components/shared-maven-build.yaml@main
     secrets: inherit
   sonar-scan:
     needs: build
-    uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
+    uses: krystof-io/common-workflows/.github/workflows/components/shared-sonar-scan.yaml@main
     secrets: inherit
   maven-deploy:
-    uses: krystof-io/common-workflows/.github/workflows/shared-maven-deploy.yaml@main
+    uses: krystof-io/common-workflows/.github/workflows/components/shared-maven-deploy.yaml@main
     needs: [build, sonar-scan]
     secrets: inherit
     with:

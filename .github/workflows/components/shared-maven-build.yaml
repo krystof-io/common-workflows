@@ -5,6 +5,18 @@ on:
       generic_image_version:
         description: Generic image version (without hash)
         value: ${{ jobs.build.outputs.generic_image_version }}
+      unique_image_version:
+        description: Unique image version (with hash)
+        value: ${{ jobs.build.outputs.unique_image_version }}
+      artifact_version:
+        description: Artifact Version (e.g. maven version)
+        value: ${{ jobs.build.outputs.artifact_version }}
+      artifact_id:
+        description: Artifact ID (e.g. maven artifact ID)
+        value: ${{ jobs.build.outputs.artifact_id }}
+      scm_tag_type:
+        description: SCM Tag type (release or snapshot)
+        value: ${{ jobs.build.outputs.scm_tag_type }}
 env:
   MAVEN_REPO_URL: ${{ vars.MAVEN_REPO_URL }}
   MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
