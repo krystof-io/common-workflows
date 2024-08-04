@@ -11,4 +11,4 @@ jobs:
     secrets: inherit
   maven-deploy:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-deploy.yaml@main
-    needs: [build, sonar_cve_scan]
+    needs: [build, sonar-scan]
