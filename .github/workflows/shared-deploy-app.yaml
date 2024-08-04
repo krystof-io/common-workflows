@@ -11,14 +11,7 @@ on:
       scm_tag_type:
         type: string
 jobs:
-  log-env:
-    runs-on: arc-runners
-    steps:
-      - name: Logging env
-        run: printenv
-
   deploy-to-dev:
-    needs: [build,docker]
     if: ${{ github.ref_type == 'branch'  }}
     uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env.yaml@main
     with:
@@ -28,7 +21,6 @@ jobs:
     secrets: inherit
 
   deploy-to-test:
-    needs: [build,docker]
     if: ${{ github.ref_type == 'tag' &&  inputs.scm_tag_type == 'snapshot'}}
     uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env.yaml@main
     with:
@@ -38,7 +30,6 @@ jobs:
     secrets: inherit
 
   deploy-to-prod:
-    needs: [build,docker]
     if: ${{ github.ref_type == 'tag' &&  inputs.scm_tag_type == 'release'}}
     uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env.yaml@main
     with:
