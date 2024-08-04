@@ -3,5 +3,5 @@ on:
   workflow_call:
 jobs:
   shared-maven-build:
-    uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
+    uses: .github/workflows/shared-maven-build.yaml@main
     secrets: inherit

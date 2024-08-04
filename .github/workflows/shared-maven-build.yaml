@@ -1,7 +1,6 @@
 name: Shared Maven Build
 on:
-  - push
-  - workflow_dispatch
+  workflow_call:
 
 env:
   MAVEN_REPO_URL: ${{ vars.MAVEN_REPO_URL }}
