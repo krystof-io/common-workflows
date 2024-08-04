@@ -1,7 +1,8 @@
 name: Shared Maven Build
 on:
   workflow_call:
-
+    outputs:
+      generic_image_version: ${{ jobs.build.outputs.generic_image_version }}
 env:
   MAVEN_REPO_URL: ${{ vars.MAVEN_REPO_URL }}
   MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
