@@ -1,0 +1,72 @@
+run-name: Deploy to ${{inputs.target_env}}
+on:
+  workflow_call:
+    inputs:
+      target_env:
+        type: string
+      artifact_id:
+        type: string
+      image_version:
+        type: string
+jobs:
+  deploy-app:
+    runs-on: arc-runners
+    env:
+      IMAGE_REGISTRY_HOST: ${{ vars.IMAGE_REGISTRY_HOST }}
+      IMAGE_VERSION: ${{ inputs.image_version }}
+      ARTIFACT_ID: ${{ inputs.artifact_id }}
+      CICD_USER_NAME: ${{ secrets.CICD_USER_NAME }}
+      CICD_USER_EMAIL: ${{ secrets.CICD_USER_EMAIL }}
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
+      TARGET_ENV: ${{ inputs.target_env }}
+    steps:
+      - name: Logging env
+        run: printenv
+
+      - name: Checkout Kubernetes manifests repository
+        uses: actions/checkout@v4.1.7
+        with:
+          repository: erkrystof/homelab
+          ref: main
+          token: ${{ env.CICD_TOKEN }}
+
+      - uses: philiplehmann/setup-kustomize@v2.2.5
+
+      - name: Update kustomize image
+        run: |
+          set -e
+          MAX_RETRIES=5
+          RETRY_DELAY=2
+          
+          cd argocd/kio-apps/${{env.ARTIFACT_ID}}/overlays/${{env.TARGET_ENV}}
+          
+          git config --global user.email "${{env.CICD_USER_EMAIL}}"
+          git config --global user.name "${{env.CICD_USER_NAME}}"
+          git config --global user.password "${{env.CICD_TOKEN}}"
+          
+          update_and_push() {
+            git pull --rebase
+            kustomize edit set image \
+              my-image=${{ env.IMAGE_REGISTRY_HOST}}/${{github.repository}}:${{ env.IMAGE_VERSION }}
+            git add .
+            git commit -m "Updating ${{env.TARGET_ENV}} image version for ${{env.ARTIFACT_ID}} to ${{env.IMAGE_VERSION}}"
+            git push
+          }
+          
+          retry_count=0
+          while [ $retry_count -lt $MAX_RETRIES ]; do
+          if update_and_push; then
+            echo "Changes pushed successfully."
+            exit 0
+          else
+            echo "Failed to push changes."
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $MAX_RETRIES ]; then
+              echo "Retrying in $RETRY_DELAY seconds... (Attempt $retry_count of $MAX_RETRIES)"
+              sleep $RETRY_DELAY
+            fi
+          fi
+          done
+          
+          echo "Failed to push changes after $MAX_RETRIES attempts."
+          exit 1
