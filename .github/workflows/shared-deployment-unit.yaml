@@ -1,0 +1,9 @@
+run-name: Deploy to ${{inputs.target_env}}
+on:
+  workflow_call:
+jobs:
+  shared-deployment-unit:
+    runs-on: arc-runners
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
