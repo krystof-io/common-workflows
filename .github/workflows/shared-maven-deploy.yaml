@@ -2,7 +2,7 @@ name: Shared Maven Deploy
 on:
   workflow_call:
     inputs:
-      image_version:
+      unique_image_version:
         type: string
 env:
   MAVEN_REPO_URL: ${{ vars.MAVEN_REPO_URL }}
@@ -10,7 +10,7 @@ env:
   MAVEN_REPO_PASSWORD: ${{ secrets.MAVEN_REPO_PASSWORD }}
   MAVEN_PRIVATE_SNAPSHOT_REPO_URL: ${{ vars.MAVEN_PRIVATE_SNAPSHOT_REPO_URL }}
   MAVEN_PRIVATE_RELEASE_REPO_URL: ${{ vars.MAVEN_PRIVATE_RELEASE_REPO_URL }}
-  UNIQUE_IMAGE_VERSION: ${{ inputs.image_version }}
+  UNIQUE_IMAGE_VERSION: ${{ inputs.unique_image_version }}
 jobs:
   maven-deploy:
     runs-on: arc-runners
