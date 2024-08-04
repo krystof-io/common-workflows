@@ -5,3 +5,6 @@ jobs:
   shared-maven-build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
     secrets: inherit
+  shared-sonar-scan:
+    uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
+    secrets: inherit
