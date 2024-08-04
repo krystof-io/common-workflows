@@ -19,6 +19,7 @@ jobs:
       CICD_USER_EMAIL: ${{ secrets.CICD_USER_EMAIL }}
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       TARGET_ENV: ${{ inputs.target_env }}
+
     steps:
       - name: Logging env
         run: printenv

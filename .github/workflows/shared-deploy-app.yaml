@@ -1,0 +1,42 @@
+name: Shared Deploy App
+on:
+  workflow_call:
+    inputs:
+      unique_image_version:
+        type: string
+      generic_image_version:
+        type: string
+      artifact_id:
+        type: string
+      scm_tag_type:
+        type: string
+jobs:
+  deploy-to-dev:
+    needs: [build,docker]
+    if: ${{ github.ref_type == 'branch'  }}
+    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env.yaml@main
+    with:
+      target_env: dev
+      artifact_id: ${{ inputs.artifact_id }}
+      image_version: ${{ inputs.unique_image_version }}
+    secrets: inherit
+
+  deploy-to-test:
+    needs: [build,docker]
+    if: ${{ github.ref_type == 'tag' &&  inputs.scm_tag_type == 'snapshot'}}
+    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env.yaml@main
+    with:
+      target_env: test
+      artifact_id: ${{ inputs.artifact_id }}
+      image_version: ${{ inputs.unique_image_version }}
+    secrets: inherit
+
+  deploy-to-prod:
+    needs: [build,docker]
+    if: ${{ github.ref_type == 'tag' &&  inputs.scm_tag_type == 'release'}}
+    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env.yaml@main
+    with:
+      target_env: prod
+      artifact_id: ${{ inputs.artifact_id }}
+      image_version: ${{ inputs.generic_image_version }}
+    secrets: inherit

@@ -165,32 +165,3 @@ jobs:
             ${{ env.IMAGE_REGISTRY_HOST}}/${{github.repository}}:${{ env.GENERIC_IMAGE_VERSION }}
           docker push ${{ env.IMAGE_REGISTRY_HOST}}/${{github.repository}}:${{ env.GENERIC_IMAGE_VERSION }}
 
-  deploy-to-dev:
-    needs: [build,docker]
-    if: ${{ github.ref_type == 'branch'  }}
-    uses: krystof-io/common-workflows/.github/workflows/deploy-app.yaml@main
-    with:
-      target_env: dev
-      artifact_id: ${{ needs.build.outputs.artifact_id }}
-      image_version: ${{ needs.build.outputs.unique_image_version }}
-    secrets: inherit
-
-  deploy-to-test:
-    needs: [build,docker]
-    if: ${{ github.ref_type == 'tag' &&  needs.build.outputs.scm_tag_type == 'snapshot'}}
-    uses: krystof-io/common-workflows/.github/workflows/deploy-app.yaml@main
-    with:
-      target_env: test
-      artifact_id: ${{ needs.build.outputs.artifact_id }}
-      image_version: ${{ needs.build.outputs.unique_image_version }}
-    secrets: inherit
-
-  deploy-to-prod:
-    needs: [build,docker]
-    if: ${{ github.ref_type == 'tag' &&  needs.build.outputs.scm_tag_type == 'release'}}
-    uses: krystof-io/common-workflows/.github/workflows/deploy-app.yaml@main
-    with:
-      target_env: prod
-      artifact_id: ${{ needs.build.outputs.artifact_id }}
-      image_version: ${{ needs.build.outputs.generic_image_version }}
-    secrets: inherit

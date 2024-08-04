@@ -22,3 +22,12 @@ jobs:
     with:
       generic_image_version: ${{ needs.build.outputs.generic_image_version }}
       unique_image_version: ${{ needs.build.outputs.unique_image_version }}
+  deploy-app:
+    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app.yaml@main
+    needs: [build, image-build]
+    secrets: inherit
+    with:
+      generic_image_version: ${{ needs.build.outputs.generic_image_version }}
+      unique_image_version: ${{ needs.build.outputs.unique_image_version }}
+      artifact_id: ${{ needs.build.outputs.artifact_id }}
+      scm_tag_type: ${{ needs.build.outputs.ref_type }}
