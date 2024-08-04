@@ -11,6 +11,13 @@ on:
       scm_tag_type:
         type: string
 jobs:
+
+  test-log-env:
+    runs-on: arc-runners
+    steps:
+      - name: Logging env
+        run: printenv
+
   deploy-to-dev:
     if: ${{ github.ref_type == 'branch'  }}
     uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env.yaml@main
