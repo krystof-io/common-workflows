@@ -30,4 +30,4 @@ jobs:
       generic_image_version: ${{ needs.build.outputs.generic_image_version }}
       unique_image_version: ${{ needs.build.outputs.unique_image_version }}
       artifact_id: ${{ needs.build.outputs.artifact_id }}
-      scm_tag_type: ${{ needs.build.outputs.ref_type }}
+      scm_tag_type: ${{ needs.build.outputs.scm_tag_type }}
