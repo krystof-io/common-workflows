@@ -8,7 +8,7 @@ on:
         type: string
 
 env:
-    IMAGE_REGISTRY_HOST: docker.krystof.io
+    IMAGE_REGISTRY_HOST: ${{ vars.IMAGE_REGISTRY_HOST }}
     IMAGE_REGISTRY_USERNAME: ${{ secrets.IMAGE_REGISTRY_USERNAME }}
     IMAGE_REGISTRY_PASSWORD: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
     UNIQUE_IMAGE_VERSION: ${{ inputs.unique_image_version }}
