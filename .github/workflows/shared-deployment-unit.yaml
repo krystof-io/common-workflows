@@ -14,6 +14,4 @@ jobs:
     needs: [build, sonar-scan]
     secrets: inherit
     with:
-      target_env: prod
-      artifact_id: ${{ needs.build.outputs.artifact_id }}
       image_version: ${{ needs.build.outputs.generic_image_version }}
