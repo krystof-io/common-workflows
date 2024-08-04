@@ -1,18 +1,20 @@
 name: Shared Maven Deploy
 on:
   workflow_call:
-
+    inputs:
+      image_version:
+        type: string
 env:
   MAVEN_REPO_URL: ${{ vars.MAVEN_REPO_URL }}
   MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
   MAVEN_REPO_PASSWORD: ${{ secrets.MAVEN_REPO_PASSWORD }}
   MAVEN_PRIVATE_SNAPSHOT_REPO_URL: ${{ vars.MAVEN_PRIVATE_SNAPSHOT_REPO_URL }}
   MAVEN_PRIVATE_RELEASE_REPO_URL: ${{ vars.MAVEN_PRIVATE_RELEASE_REPO_URL }}
+  UNIQUE_IMAGE_VERSION: ${{ inputs.image_version }}
 jobs:
   maven-deploy:
     runs-on: arc-runners
-    env:
-      UNIQUE_IMAGE_VERSION: ${{ needs.build.outputs.unique_image_version }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.7
