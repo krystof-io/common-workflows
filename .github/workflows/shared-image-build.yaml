@@ -2,7 +2,7 @@ name: Shared Maven Deploy
 on:
   workflow_call:
     inputs:
-      general_image_version:
+      generic_image_version:
         type: string
       unique_image_version:
         type: string
