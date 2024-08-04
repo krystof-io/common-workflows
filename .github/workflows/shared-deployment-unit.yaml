@@ -2,10 +2,13 @@ run-name: Deploy to ${{inputs.target_env}}
 on:
   workflow_call:
 jobs:
-  shared-maven-build:
+  build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
     secrets: inherit
-  shared-sonar-scan:
-    needs: shared-maven-build
+  sonar-scan:
+    needs: build
     uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
     secrets: inherit
+  maven-deploy:
+    uses: krystof-io/common-workflows/.github/workflows/shared-maven-deploy.yaml@main
+    needs: [build, sonar_cve_scan]

@@ -3,7 +3,7 @@ on:
   workflow_call:
 
 jobs:
-  sonar_cve_scan:
+  sonar-cve-scan:
     runs-on: arc-runners
 
     steps:

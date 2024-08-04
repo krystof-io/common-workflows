@@ -6,16 +6,13 @@ env:
   MAVEN_REPO_URL: ${{ vars.MAVEN_REPO_URL }}
   MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
   MAVEN_REPO_PASSWORD: ${{ secrets.MAVEN_REPO_PASSWORD }}
-
+  MAVEN_PRIVATE_SNAPSHOT_REPO_URL: ${{ vars.MAVEN_PRIVATE_SNAPSHOT_REPO_URL }}
+  MAVEN_PRIVATE_RELEASE_REPO_URL: ${{ vars.MAVEN_PRIVATE_RELEASE_REPO_URL }}
 jobs:
-  build:
+  maven-deploy:
     runs-on: arc-runners
-    outputs:
-      unique_image_version: ${{ steps.set_build_vars.outputs.unique_image_version }}
-      generic_image_version: ${{ steps.set_build_vars.outputs.generic_image_version }}
-      artifact_version: ${{ steps.set_build_vars.outputs.artifact_version }}
-      artifact_id: ${{ steps.set_build_vars.outputs.artifact_id }}
-      scm_tag_type: ${{ steps.set_build_vars.outputs.scm_tag_type }}
+    env:
+      UNIQUE_IMAGE_VERSION: ${{ needs.build.outputs.unique_image_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.7
@@ -33,39 +30,16 @@ jobs:
             {"id": "nexus", "name":"nexus", "mirrorOf":"*", "url":"${{ env.MAVEN_REPO_URL }}"}
             ]
 
-      - name: Set up vars
-        id: set_build_vars
-        run: |
-          ARTIFACT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          ARTIFACT_ID=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
-          
-          echo "artifact_id=$ARTIFACT_ID" >> "$GITHUB_OUTPUT"
-          echo "artifact_version=$ARTIFACT_VERSION" >> "$GITHUB_OUTPUT"
-          echo "artifact_id=$ARTIFACT_ID" >> "$GITHUB_ENV"
-          echo "artifact_version=$ARTIFACT_VERSION" >> "$GITHUB_ENV"
-          
-          TAG_NAME=${{ github.ref_name }}
-
-          if [[ "$TAG_NAME" =~ ^[0-9]+(\.[0-9]+)*(-[a-zA-Z0-9]+)?$ ]]; then
-            SCM_TAG_TYPE="release"
-          else
-            SCM_TAG_TYPE="snapshot"
-          fi
-          
-          echo "SCM_TAG_TYPE=$SCM_TAG_TYPE" >> $GITHUB_ENV
-          echo "scm_tag_type=$SCM_TAG_TYPE" >> "$GITHUB_OUTPUT"
-
-          UNIQUE_IMAGE_VERSION="$ARTIFACT_VERSION-${GITHUB_SHA::10}"
-          GENERIC_IMAGE_VERSION="$ARTIFACT_VERSION"
-          
-          echo "unique_image_version=$UNIQUE_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
-          echo "generic_image_version=$GENERIC_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
-          echo "UNIQUE_IMAGE_VERSION=$UNIQUE_IMAGE_VERSION" >> $GITHUB_ENV
-          echo "GENERIC_IMAGE_VERSION=$GENERIC_IMAGE_VERSION" >> $GITHUB_ENV
-
-      - name: Logging env
-        run: printenv
-
-      - name: Maven Test Build
+      - name: Maven Repo Deploy
         run: >
-          mvn -f pom.xml clean verify -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}}
+          mvn -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
+            -DskipTests=true \
+            -DaltSnapshotDeploymentRepository=private-snapshots::default::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
+            -DaltReleaseDeploymentRepository=private-releases::default::${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{env.UNIQUE_IMAGE_VERSION}}.jar
+          path: target/*.jar
+          retention-days: 1
