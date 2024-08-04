@@ -11,6 +11,12 @@ on:
       scm_tag_type:
         type: string
 jobs:
+  log-env:
+    runs-on: arc-runners
+    steps:
+      - name: Logging env
+        run: printenv
+
   deploy-to-dev:
     needs: [build,docker]
     if: ${{ github.ref_type == 'branch'  }}
