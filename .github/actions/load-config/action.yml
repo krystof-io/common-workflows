@@ -70,7 +70,8 @@ runs:
         
         # Convert to JSON for output
         CONFIG=$(echo "${CONFIG}" | yq eval -o=json -)
-        
+        echo "${CONFIG}"
+        echo ""
         # Escape potential newlines and special characters for GitHub Actions
         CONFIG="${CONFIG//'%'/'%25'}"
         CONFIG="${CONFIG//$'\n'/'%0A'}"
