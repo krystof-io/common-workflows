@@ -1,4 +1,4 @@
-run-name: Deploy to ${{inputs.target_env}}
+run-name: DU Branch Build
 on:
   workflow_call:
 jobs:
@@ -12,20 +12,10 @@ jobs:
       - id: load-config
         uses: krystof-io/common-workflows/.github/actions/load-config@main
 
-      - name : Logging env
-        run: printenv
-
   build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
-    secrets: inherit
-  something:
     needs: setup
-    runs-on: arc-runners-prod
-    steps:
-      - name: output config
-        run: |
-          echo "Custom value: ${{ needs.setup.outputs.config }}"
-
+    secrets: inherit
   maven-deploy:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-deploy.yaml@main
     needs: [build, sonar-scan]
