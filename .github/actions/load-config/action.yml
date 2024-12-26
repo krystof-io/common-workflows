@@ -1,0 +1,80 @@
+# .github/actions/load-config/action.yml
+name: 'Load Workflow Configuration'
+description: 'Loads and merges workflow configuration with defaults'
+
+inputs:
+  defaults-repo:
+    description: 'Repository containing default configuration'
+    required: false
+    default: 'krystof-io/common-workflows'
+  defaults-ref:
+    description: 'Git ref to use for defaults repository'
+    required: false
+    default: 'main'
+  defaults-path:
+    description: 'Path to defaults file in the defaults repository'
+    required: false
+    default: '.github/workflow-defaults.yml'
+  config-path:
+    description: 'Path to local configuration file'
+    required: false
+    default: '.github/workflow.yml'
+
+outputs:
+  env_config:
+    description: 'Environment configuration'
+    value: ${{ steps.merge-config.outputs.env_config }}
+  maven_config:
+    description: 'Maven configuration'
+    value: ${{ steps.merge-config.outputs.maven_config }}
+  flux_config:
+    description: 'Flux configuration'
+    value: ${{ steps.merge-config.outputs.flux_config }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout defaults repository
+      uses: actions/checkout@v4.1.7
+      with:
+        repository: ${{ inputs.defaults-repo }}
+        path: .github/defaults
+        ref: ${{ inputs.defaults-ref }}
+
+    - name: Merge configurations
+      id: merge-config
+      shell: bash
+      run: |
+        # Function to merge config with defaults and convert to JSON
+        merge_config() {
+          local path=$1
+          local default_path=$2
+          local default_file=".github/defaults/${{ inputs.defaults-path }}"
+          local config_file="${{ inputs.config-path }}"
+        
+          if [ -f "${config_file}" ] && yq eval "${path}" "${config_file}" &>/dev/null; then
+            # Merge default with custom, preferring custom values
+            yq eval-all -o=json "select(fileIndex == 0) * select(fileIndex == 1)" \
+              "${default_file}" "${config_file}" | \
+              yq eval "${path}" -
+          else
+            # Use defaults only
+            yq eval -o=json "${path}" "${default_file}"
+          fi
+        }
+        
+        # Load and merge environment config
+        ENV_CONFIG=$(merge_config ".environments" ".environments")
+        echo "env_config=${ENV_CONFIG}" >> "$GITHUB_OUTPUT"
+        
+        # Load and merge maven config
+        MAVEN_CONFIG=$(merge_config ".maven" ".maven")
+        echo "maven_config=${MAVEN_CONFIG}" >> "$GITHUB_OUTPUT"
+        
+        # Load and merge flux config
+        FLUX_CONFIG=$(merge_config ".deployment.flux" ".deployment.flux")
+        echo "flux_config=${FLUX_CONFIG}" >> "$GITHUB_OUTPUT"
+
+    - name: Logging env
+      shell: bash
+      run: printenv

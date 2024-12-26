@@ -2,6 +2,18 @@ run-name: Deploy to ${{inputs.target_env}}
 on:
   workflow_call:
 jobs:
+  setup:
+    runs-on: arc-runners-prod
+    outputs:
+      env_config: ${{ steps.load-config.outputs.env_config }}
+      maven_config: ${{ steps.load-config.outputs.maven_config }}
+      flux_config: ${{ steps.load-config.outputs.flux_config }}
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - id: load-config
+        uses: krystof-io/common-workflows/.github/actions/load-config@main
+
   build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
     secrets: inherit
