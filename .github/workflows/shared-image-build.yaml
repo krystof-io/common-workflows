@@ -15,7 +15,7 @@ env:
     GENERIC_IMAGE_VERSION: ${{ inputs.generic_image_version }}
 jobs:
   image-build:
-    runs-on: arc-runners
+    runs-on: arc-runners-prod
 
     steps:
       - name: Logging env

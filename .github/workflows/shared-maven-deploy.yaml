@@ -13,7 +13,7 @@ env:
   UNIQUE_IMAGE_VERSION: ${{ inputs.unique_image_version }}
 jobs:
   maven-deploy:
-    runs-on: arc-runners
+    runs-on: arc-runners-prod
 
     steps:
       - name: Checkout

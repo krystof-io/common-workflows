@@ -24,7 +24,7 @@ env:
 
 jobs:
   build:
-    runs-on: arc-runners
+    runs-on: arc-runners-prod
     outputs:
       unique_image_version: ${{ steps.set_build_vars.outputs.unique_image_version }}
       generic_image_version: ${{ steps.set_build_vars.outputs.generic_image_version }}

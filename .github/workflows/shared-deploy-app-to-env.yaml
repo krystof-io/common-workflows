@@ -10,7 +10,7 @@ on:
         type: string
 jobs:
   deploy-app:
-    runs-on: arc-runners
+    runs-on: arc-runners-prod
     env:
       IMAGE_REGISTRY_HOST: ${{ vars.IMAGE_REGISTRY_HOST }}
       IMAGE_VERSION: ${{ inputs.image_version }}
