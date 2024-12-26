@@ -5,10 +5,6 @@ jobs:
   build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
     secrets: inherit
-  sonar-scan:
-    needs: build
-    uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
-    secrets: inherit
   maven-deploy:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-deploy.yaml@main
     needs: [build, sonar-scan]
@@ -22,6 +18,10 @@ jobs:
     with:
       generic_image_version: ${{ needs.build.outputs.generic_image_version }}
       unique_image_version: ${{ needs.build.outputs.unique_image_version }}
+  sonar-scan:
+    needs: build
+    uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
+    secrets: inherit
   deploy-app:
     uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app.yaml@main
     needs: [build, image-build]

@@ -17,6 +17,12 @@ on:
       scm_tag_type:
         description: SCM Tag type (release or snapshot)
         value: ${{ jobs.build.outputs.scm_tag_type }}
+      has_snapshot_dependencies:
+        description: Whether the project has any SNAPSHOT dependencies
+        value: ${{ jobs.build.outputs.has_snapshot_dependencies }}
+      is_snapshot:
+        description: Whether the project itself is a SNAPSHOT
+        value: ${{ jobs.build.outputs.is_snapshot }}
 env:
   MAVEN_REPO_URL: ${{ vars.MAVEN_REPO_URL }}
   MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
@@ -47,6 +53,28 @@ jobs:
             [
             {"id": "nexus", "name":"nexus", "mirrorOf":"*", "url":"${{ env.MAVEN_REPO_URL }}"}
             ]
+
+      - name: Check for SNAPSHOT dependencies
+        id: check_snapshots
+        run: |
+          # Check if project version is SNAPSHOT
+          PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          if [[ $PROJECT_VERSION == *-SNAPSHOT ]]; then
+            echo "is_snapshot=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_snapshot=false" >> "$GITHUB_OUTPUT"
+          fi
+          
+          # Get dependency tree and check for SNAPSHOTS
+          SNAPSHOT_COUNT=$(mvn dependency:list -DexcludeTransitive=true | grep -c SNAPSHOT || true)
+          if [ "$SNAPSHOT_COUNT" -gt 0 ]; then
+            echo "has_snapshot_dependencies=true" >> "$GITHUB_OUTPUT"
+            echo "Found $SNAPSHOT_COUNT SNAPSHOT dependencies:"
+            mvn dependency:list -DexcludeTransitive=true | grep SNAPSHOT
+          else
+            echo "has_snapshot_dependencies=false" >> "$GITHUB_OUTPUT"
+            echo "No SNAPSHOT dependencies found"
+          fi
 
       - name: Set up vars
         id: set_build_vars
