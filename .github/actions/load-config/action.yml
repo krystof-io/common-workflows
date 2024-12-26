@@ -1,10 +1,7 @@
 # .github/actions/load-config/action.yml
 name: 'Load Workflow Configuration'
 description: 'Loads and merges workflow configuration with defaults'
-#               CONFIG='${{ steps.load-config.outputs.config }}'
-#               NAMESPACE=$(echo "$CONFIG" | jq -r --arg env "${{ inputs.environment }}" \
-#               '.environments[$env].namespace // "default"')
-#               echo "namespace=$NAMESPACE" >> "$GITHUB_OUTPUT"
+
 inputs:
   defaults-repo:
     description: 'Repository containing default configuration'
@@ -70,8 +67,7 @@ runs:
         
         # Convert to JSON for output
         CONFIG=$(echo "${CONFIG}" | yq eval -o=json -)
-        echo "${CONFIG}"
-        echo ""
+        
         # Escape potential newlines and special characters for GitHub Actions
         CONFIG="${CONFIG//'%'/'%25'}"
         CONFIG="${CONFIG//$'\n'/'%0A'}"
