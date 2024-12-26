@@ -21,15 +21,9 @@ inputs:
     default: '.github/workflow.yml'
 
 outputs:
-  env_config:
-    description: 'Environment configuration'
-    value: ${{ steps.merge-config.outputs.env_config }}
-  maven_config:
-    description: 'Maven configuration'
-    value: ${{ steps.merge-config.outputs.maven_config }}
-  flux_config:
-    description: 'Flux configuration'
-    value: ${{ steps.merge-config.outputs.flux_config }}
+  config:
+    description: 'Merged configuration'
+    value: ${{ steps.merge-config.outputs.config }}
 
 runs:
   using: "composite"
@@ -45,36 +39,38 @@ runs:
       id: merge-config
       shell: bash
       run: |
-        # Function to merge config with defaults and convert to JSON
-        merge_config() {
-          local path=$1
-          local default_path=$2
-          local default_file=".github/defaults/${{ inputs.defaults-path }}"
-          local config_file="${{ inputs.config-path }}"
+        default_file=".github/defaults/${{ inputs.defaults-path }}"
+        config_file="${{ inputs.config-path }}"
         
-          if [ -f "${config_file}" ] && yq eval "${path}" "${config_file}" &>/dev/null; then
-            # Merge default with custom, preferring custom values
-            yq eval-all -o=json "select(fileIndex == 0) * select(fileIndex == 1)" \
-              "${default_file}" "${config_file}" | \
-              yq eval "${path}" -
-          else
-            # Use defaults only
-            yq eval -o=json "${path}" "${default_file}"
-          fi
-        }
+        echo "=== Default Configuration ==="
+        cat "${default_file}"
+        echo ""
         
-        # Load and merge environment config
-        ENV_CONFIG=$(merge_config ".environments" ".environments")
-        echo "env_config=${ENV_CONFIG}" >> "$GITHUB_OUTPUT"
+        if [ -f "${config_file}" ]; then
+          echo "=== Local Configuration ==="
+          cat "${config_file}"
+          echo ""
         
-        # Load and merge maven config
-        MAVEN_CONFIG=$(merge_config ".maven" ".maven")
-        echo "maven_config=${MAVEN_CONFIG}" >> "$GITHUB_OUTPUT"
+          echo "=== Merging Configurations ==="
+          # Merge default with custom, preferring custom values
+          CONFIG=$(yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' \
+            "${default_file}" "${config_file}")
+        else
+          echo "No local configuration found at ${config_file}"
+          echo "=== Using Default Configuration ==="
+          CONFIG=$(yq eval "${default_file}" -)
+        fi
         
-        # Load and merge flux config
-        FLUX_CONFIG=$(merge_config ".deployment.flux" ".deployment.flux")
-        echo "flux_config=${FLUX_CONFIG}" >> "$GITHUB_OUTPUT"
-
-    - name: Logging env
-      shell: bash
-      run: printenv
+        echo "=== Final Merged Configuration ==="
+        echo "${CONFIG}"
+        echo ""
+        
+        # Convert to JSON for output
+        CONFIG=$(echo "${CONFIG}" | yq eval -o=json -)
+        
+        # Escape potential newlines and special characters for GitHub Actions
+        CONFIG="${CONFIG//'%'/'%25'}"
+        CONFIG="${CONFIG//$'\n'/'%0A'}"
+        CONFIG="${CONFIG//$'\r'/'%0D'}"
+        
+        echo "config=${CONFIG}" >> "$GITHUB_OUTPUT"

@@ -5,18 +5,27 @@ jobs:
   setup:
     runs-on: arc-runners-prod
     outputs:
-      env_config: ${{ steps.load-config.outputs.env_config }}
-      maven_config: ${{ steps.load-config.outputs.maven_config }}
-      flux_config: ${{ steps.load-config.outputs.flux_config }}
+      config: ${{ steps.load-config.outputs.config }}
     steps:
       - uses: actions/checkout@v4.1.7
 
       - id: load-config
         uses: krystof-io/common-workflows/.github/actions/load-config@main
 
+      - name : Logging env
+        run: printenv
+
   build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
     secrets: inherit
+  something:
+    needs: setup
+    runs-on: arc-runners-prod
+    steps:
+      - name: output config
+        run: |
+          echo "Custom value: ${{ needs.setup.outputs.config }}"
+
   maven-deploy:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-deploy.yaml@main
     needs: [build, sonar-scan]
