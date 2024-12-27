@@ -51,10 +51,17 @@ runs:
           cat "${config_file}"
           echo ""
         
-          echo "=== Merging Configurations ==="
-          # Merge default with custom, preferring custom values
-          CONFIG=$(yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' \
-            "${default_file}" "${config_file}")
+          # Try to load local config as JSON to check if it's empty or just comments
+          LOCAL_CONFIG=$(yq eval -o=json "${config_file}" 2>/dev/null)
+          if [ "$?" -eq 0 ] && [ "$LOCAL_CONFIG" != "null" ] && [ "$LOCAL_CONFIG" != "{}" ]; then
+            echo "=== Merging Configurations ==="
+            CONFIG=$(yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' \
+              "${default_file}" "${config_file}")
+          else
+            echo "Local configuration is empty or contains only comments"
+            echo "=== Using Default Configuration ==="
+            CONFIG=$(yq eval "${default_file}" -)
+          fi
         else
           echo "No local configuration found at ${config_file}"
           echo "=== Using Default Configuration ==="
