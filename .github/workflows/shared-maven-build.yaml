@@ -62,7 +62,7 @@ jobs:
           PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           if [[ $PROJECT_VERSION == *-SNAPSHOT ]]; then
             echo "is_snapshot=true" >> "$GITHUB_OUTPUT"
-            echo "| Hello world! | Shit" >> $GITHUB_STEP_SUMMARY
+            echo "This build is a *SNAPSHOT*" >> $GITHUB_STEP_SUMMARY
           else
             echo "is_snapshot=false" >> "$GITHUB_OUTPUT"
           fi
@@ -71,6 +71,7 @@ jobs:
           SNAPSHOT_COUNT=$(mvn dependency:list -DexcludeTransitive=true | grep -c SNAPSHOT || true)
           if [ "$SNAPSHOT_COUNT" -gt 0 ]; then
             echo "has_snapshot_dependencies=true" >> "$GITHUB_OUTPUT"
+            echo "This build has *SNAPSHOT DEPENDENCIES*" >> $GITHUB_STEP_SUMMARY
             echo "Found $SNAPSHOT_COUNT SNAPSHOT dependencies:"
             mvn dependency:list -DexcludeTransitive=true | grep SNAPSHOT
           else
@@ -102,6 +103,8 @@ jobs:
 
           UNIQUE_IMAGE_VERSION="$ARTIFACT_VERSION-${GITHUB_SHA::10}"
           GENERIC_IMAGE_VERSION="$ARTIFACT_VERSION"
+          echo "Generic Image Version: $GENERIC_IMAGE_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "Unique  Image Version: $UNIQUE_IMAGE_VERSION" >> $GITHUB_STEP_SUMMARY
           
           echo "unique_image_version=$UNIQUE_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
           echo "generic_image_version=$GENERIC_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
