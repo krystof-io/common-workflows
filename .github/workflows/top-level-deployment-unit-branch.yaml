@@ -33,12 +33,22 @@ jobs:
     needs: build
     uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
     secrets: inherit
-  deploy-app:
-    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app.yaml@main
+  deploy-dev:
+    if: ${{ github.ref_type == 'branch'  }}
+    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env.yaml@main
     needs: [build, image-build]
     secrets: inherit
     with:
-      generic_image_version: ${{ needs.build.outputs.generic_image_version }}
-      unique_image_version: ${{ needs.build.outputs.unique_image_version }}
+      target_env: dev
       artifact_id: ${{ needs.build.outputs.artifact_id }}
-      scm_tag_type: ${{ needs.build.outputs.scm_tag_type }}
+      image_version: ${{ needs.build.outputs.unique_image_version }}
+
+#  deploy-app:
+#    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app.yaml@main
+#    needs: [build, image-build]
+#    secrets: inherit
+#    with:
+#      generic_image_version: ${{ needs.build.outputs.generic_image_version }}
+#      unique_image_version: ${{ needs.build.outputs.unique_image_version }}
+#      artifact_id: ${{ needs.build.outputs.artifact_id }}
+#      scm_tag_type: ${{ needs.build.outputs.scm_tag_type }}
