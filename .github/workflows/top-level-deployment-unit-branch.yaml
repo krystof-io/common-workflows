@@ -24,7 +24,7 @@ jobs:
 #      unique_image_version: ${{ needs.build.outputs.unique_image_version }}
   image-build:
     uses: krystof-io/common-workflows/.github/workflows/shared-image-build.yaml@main
-    needs: [build, maven-deploy]
+    needs: [build]
     secrets: inherit
     with:
       generic_image_version: ${{ needs.build.outputs.generic_image_version }}
