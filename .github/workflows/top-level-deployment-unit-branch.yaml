@@ -12,6 +12,15 @@ jobs:
       - id: load-config
         uses: krystof-io/common-workflows/.github/actions/load-config@main
 
+      - name: Create annotation for build error
+        run: echo "::error file=app.js,line=1::Missing semicolon"
+
+      - name: Create annotation for build error2
+        run: echo "### Hello world! :rocket:" >> $GITHUB_STEP_SUMMARY
+
+      - name: Create annotation for build error3
+        run: echo "### Hello world2! :rocket:" >> $GITHUB_STEP_SUMMARY
+
   build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
     needs: setup
