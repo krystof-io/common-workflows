@@ -16,12 +16,12 @@ jobs:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
     needs: setup
     secrets: inherit
-  maven-deploy:
-    uses: krystof-io/common-workflows/.github/workflows/shared-maven-deploy.yaml@main
-    needs: [build, sonar-scan]
-    secrets: inherit
-    with:
-      unique_image_version: ${{ needs.build.outputs.unique_image_version }}
+#  maven-deploy:
+#    uses: krystof-io/common-workflows/.github/workflows/shared-maven-deploy.yaml@main
+#    needs: [build, sonar-scan]
+#    secrets: inherit
+#    with:
+#      unique_image_version: ${{ needs.build.outputs.unique_image_version }}
   image-build:
     uses: krystof-io/common-workflows/.github/workflows/shared-image-build.yaml@main
     needs: [build, maven-deploy]

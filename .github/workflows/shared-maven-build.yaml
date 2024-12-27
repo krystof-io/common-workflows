@@ -27,7 +27,8 @@ env:
   MAVEN_REPO_URL: ${{ vars.MAVEN_REPO_URL }}
   MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
   MAVEN_REPO_PASSWORD: ${{ secrets.MAVEN_REPO_PASSWORD }}
-
+  MAVEN_PRIVATE_SNAPSHOT_REPO_URL: ${{ vars.MAVEN_PRIVATE_SNAPSHOT_REPO_URL }}
+  MAVEN_PRIVATE_RELEASE_REPO_URL: ${{ vars.MAVEN_PRIVATE_RELEASE_REPO_URL }}
 jobs:
   build:
     runs-on: arc-runners-prod
@@ -111,4 +112,13 @@ jobs:
 
       - name: Maven Test Build
         run: >
-          mvn -f pom.xml clean verify -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}}
+          mvn -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
+          -DaltSnapshotDeploymentRepository=private-snapshots::default::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
+          -DaltReleaseDeploymentRepository=private-releases::default::${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{env.UNIQUE_IMAGE_VERSION}}.jar
+          path: target/*.jar
+          retention-days: 1
