@@ -62,6 +62,7 @@ jobs:
           PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           if [[ $PROJECT_VERSION == *-SNAPSHOT ]]; then
             echo "is_snapshot=true" >> "$GITHUB_OUTPUT"
+            echo "| Hello world! | Shit" >> $GITHUB_STEP_SUMMARY
           else
             echo "is_snapshot=false" >> "$GITHUB_OUTPUT"
           fi
