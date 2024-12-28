@@ -12,7 +12,6 @@ jobs:
       - id: load-config
         uses: krystof-io/common-workflows/.github/actions/load-config@main
 
-
   build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
     needs: setup
@@ -36,13 +35,14 @@ jobs:
     secrets: inherit
   deploy-dev:
     if: ${{ github.ref_type == 'branch'  }}
-    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env.yaml@main
+    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
     needs: [build, image-build]
     secrets: inherit
     with:
       target_env: dev
-      artifact_id: ${{ needs.build.outputs.artifact_id }}
+      target_app_name: ${{ needs.build.outputs.artifact_id }}
       image_version: ${{ needs.build.outputs.unique_image_version }}
+
 
 #  deploy-app:
 #    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app.yaml@main
