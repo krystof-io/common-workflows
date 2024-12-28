@@ -1,5 +1,4 @@
-name: DU Prod Deploy
-
+run-name: DU Prod Deploy
 on:
   workflow_dispatch:
     inputs:
