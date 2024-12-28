@@ -27,6 +27,14 @@ jobs:
     runs-on: arc-runners-prod
     needs: setup
     steps:
+
+      - name: Login to internal private docker repo
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.IMAGE_REGISTRY_HOST}}
+          username: ${{ env.IMAGE_REGISTRY_USERNAME }}
+          password: ${{ env.IMAGE_REGISTRY_PASSWORD }}
+
       - name: Validate Image Tag
         run: |
           IMAGE_TAG=${{ github.event.inputs.image_version }}
