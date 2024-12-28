@@ -118,9 +118,16 @@ jobs:
       - name: Logging env
         run: printenv
 
+      - name: Capture build time
+        run: |
+          echo "BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "Build Time: $BUILD_TIME" >> $GITHUB_STEP_SUMMARY
+          echo "BUILD_TIME=$BUILD_TIME" >> $GITHUB_ENV
+
       - name: Maven Build And Deploy
         run: >
           mvn -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
+            -Dcontainer.image.buildtime=${{env.BUILD_TIME}} \
             -DaltSnapshotDeploymentRepository=private-snapshots::default::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
             -DaltReleaseDeploymentRepository=private-releases::default::${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}}
 
