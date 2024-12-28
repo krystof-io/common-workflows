@@ -34,7 +34,7 @@ jobs:
     uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
     secrets: inherit
   deploy-dev:
-    if: ${{ github.ref_type == 'branch'  }}
+    if: ${{ github.ref_type == 'branch' || github.ref_type == 'tag' }}
     uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
     needs: [build, image-build]
     secrets: inherit
@@ -42,14 +42,12 @@ jobs:
       target_env: dev
       target_app_name: ${{ needs.build.outputs.artifact_id }}
       image_version: ${{ needs.build.outputs.unique_image_version }}
-
-
-#  deploy-app:
-#    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app.yaml@main
-#    needs: [build, image-build]
-#    secrets: inherit
-#    with:
-#      generic_image_version: ${{ needs.build.outputs.generic_image_version }}
-#      unique_image_version: ${{ needs.build.outputs.unique_image_version }}
-#      artifact_id: ${{ needs.build.outputs.artifact_id }}
-#      scm_tag_type: ${{ needs.build.outputs.scm_tag_type }}
+  deploy-test:
+    if: ${{ github.ref_type == 'tag'  }}
+    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
+    needs: [build, image-build, deploy-dev]
+    secrets: inherit
+    with:
+      target_env: test
+      target_app_name: ${{ needs.build.outputs.artifact_id }}
+      image_version: ${{ needs.build.outputs.unique_image_version }}
