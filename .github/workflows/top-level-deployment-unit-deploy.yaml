@@ -20,10 +20,22 @@ jobs:
           echo "artifact_id=$ARTIFACT_ID" >> "$GITHUB_OUTPUT"
 
   deploy-prod:
+    runs-on: arc-runners-prod
     needs: setup
-    secrets: inherit
-    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
-    with:
-      target_env: prod
-      target_app_name: ${{ needs.setup.outputs.artifact_id }}
-      image_version: ${{ github.event.inputs.image_version }}
+    steps:
+      - name: Validate Image Tag
+        run: |
+          IMAGE_TAG=${{ github.event.inputs.image_version }}
+          IMAGE_REGISTRY=${{ env.IMAGE_REGISTRY_HOST }}
+          if ! docker manifest inspect $IMAGE_REGISTRY/${{ github.repository }}:$IMAGE_TAG > /dev/null; then
+            echo "Error: Image tag $IMAGE_TAG does not exist in the registry $IMAGE_REGISTRY."
+            exit 1
+          fi
+
+      - name: Deploy to Production
+        uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
+        secrets: inherit
+        with:
+          target_env: prod
+          target_app_name: ${{ needs.setup.outputs.artifact_id }}
+          image_version: ${{ github.event.inputs.image_version }}
