@@ -31,7 +31,7 @@ jobs:
           ref: main
           token: ${{ env.CICD_TOKEN }}
 
-      - uses: philiplehmann/setup-kustomize@v2.2.5
+      #- uses: philiplehmann/setup-kustomize@v2.2.5
 
       - name: Update kustomize image
         run: |
@@ -47,8 +47,9 @@ jobs:
           
           update_and_push() {
             git pull --rebase
-            kustomize edit set image \
-              my-image=${{ env.IMAGE_REGISTRY_HOST}}/${{github.repository}}:${{ env.IMAGE_VERSION }}
+            yq -ei '.images.0.newTag = "${{ env.IMAGE_REGISTRY_HOST}}/${{github.repository}}:${{ env.IMAGE_VERSION }}"' kustomization.yaml
+#            kustomize edit set image \
+#              my-image=${{ env.IMAGE_REGISTRY_HOST}}/${{github.repository}}:${{ env.IMAGE_VERSION }}
             git add .
             git commit -m "Updating ${{env.TARGET_ENV}} image version for ${{env.TARGET_APP_NAME}} to ${{env.IMAGE_VERSION}}"
             git push
