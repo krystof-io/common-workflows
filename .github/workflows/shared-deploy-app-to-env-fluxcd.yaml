@@ -52,8 +52,6 @@ jobs:
             git add .
             git commit -m "Updating ${{env.TARGET_ENV}} image version for ${{env.TARGET_APP_NAME}} to ${{env.IMAGE_VERSION}}"
             git push
-          
-            flux reconcile source git flux-system --namespace flux-system
           }
           
           retry_count=0
