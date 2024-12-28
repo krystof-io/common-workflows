@@ -46,6 +46,7 @@ jobs:
   log-skip-reason:
     if: ${{ github.ref_type == 'tag' && (needs.build.outputs.has_snapshot_dependencies == 'true' || needs.build.outputs.is_snapshot == 'true') }}
     runs-on: arc-runners-prod
+    needs: [build]
     steps:
       - name: Log Skip Reason
         run: |
