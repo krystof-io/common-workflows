@@ -19,7 +19,7 @@ jobs:
           ARTIFACT_ID=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
           echo "artifact_id=$ARTIFACT_ID" >> "$GITHUB_OUTPUT"
 
-  deploy-prod:
+  image-verification:
     runs-on: arc-runners-prod
     needs: setup
     steps:
@@ -32,10 +32,11 @@ jobs:
             exit 1
           fi
 
-      - name: Deploy to Production
-        uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
-        secrets: inherit
-        with:
-          target_env: prod
-          target_app_name: ${{ needs.setup.outputs.artifact_id }}
-          image_version: ${{ github.event.inputs.image_version }}
+  deploy-prod:
+    needs: [setup, image-verification]
+    secrets: inherit
+    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
+    with:
+      target_env: prod
+      target_app_name: ${{ needs.setup.outputs.artifact_id }}
+      image_version: ${{ github.event.inputs.image_version }}
