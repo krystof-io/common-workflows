@@ -42,10 +42,20 @@ jobs:
       target_env: dev
       target_app_name: ${{ needs.build.outputs.artifact_id }}
       image_version: ${{ needs.build.outputs.unique_image_version }}
+
+  log-skip-reason:
+    if: ${{ github.ref_type == 'tag' && (needs.build.outputs.has_snapshot_dependencies == 'true' || needs.build.outputs.is_snapshot == 'true') }}
+    runs-on: arc-runners-prod
+    steps:
+      - name: Log Skip Reason
+        run: |
+          echo "Error: Skipping deploy-test because the build has snapshot dependencies or is a snapshot."
+          exit 1
+
   deploy-test:
-    if: ${{ github.ref_type == 'tag'  }}
+    if: ${{ github.ref_type == 'tag' && needs.build.outputs.has_snapshot_dependencies == 'false' && needs.build.outputs.is_snapshot == 'false'  }}
     uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
-    needs: [build, image-build, deploy-dev]
+    needs: [build, image-build, sonar-scan, deploy-dev]
     secrets: inherit
     with:
       target_env: test
