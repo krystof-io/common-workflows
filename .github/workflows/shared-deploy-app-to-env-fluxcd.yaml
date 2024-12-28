@@ -27,7 +27,7 @@ jobs:
       - name: Checkout Kubernetes manifests repository
         uses: actions/checkout@v4.1.7
         with:
-          repository: krystof.io/kio-homelab
+          repository: krystof-io/kio-homelab
           ref: main
           token: ${{ env.CICD_TOKEN }}
 
