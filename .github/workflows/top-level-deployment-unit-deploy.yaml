@@ -20,7 +20,6 @@ jobs:
           echo "artifact_id=$ARTIFACT_ID" >> "$GITHUB_OUTPUT"
 
   deploy-prod:
-    runs-on: arc-runners-prod
     needs: setup
     secrets: inherit
     uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
