@@ -25,10 +25,8 @@ jobs:
     runs-on: arc-runners-prod
     needs: setup
     secrets: inherit
-    steps:
-      - name: Deploy to Production
-        uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
-        with:
-          target_env: prod
-          target_app_name: ${{ needs.setup.outputs.artifact_id }}
-          image_version: ${{ github.event.inputs.image_version }}
+    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
+    with:
+      target_env: prod
+      target_app_name: ${{ needs.setup.outputs.artifact_id }}
+      image_version: ${{ github.event.inputs.image_version }}
