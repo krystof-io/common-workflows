@@ -38,6 +38,8 @@ jobs:
       artifact_version: ${{ steps.set_build_vars.outputs.artifact_version }}
       artifact_id: ${{ steps.set_build_vars.outputs.artifact_id }}
       scm_tag_type: ${{ steps.set_build_vars.outputs.scm_tag_type }}
+      has_snapshot_dependencies: ${{ steps.check_snapshots.outputs.has_snapshot_dependencies }}
+      is_snapshot: ${{ steps.check_snapshots.outputs.is_snapshot }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.7
