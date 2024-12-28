@@ -1,4 +1,4 @@
-run-name: DU Branch Build
+run-name: DU Build
 on:
   workflow_call:
 jobs:
