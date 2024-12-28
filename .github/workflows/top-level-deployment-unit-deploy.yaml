@@ -1,11 +1,9 @@
 run-name: DU Prod Deploy
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       image_version:
-        description: 'Image version to deploy'
-        required: true
-        default: ''
+        type: string
 
 jobs:
   setup:
