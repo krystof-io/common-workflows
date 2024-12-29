@@ -18,7 +18,6 @@ inputs:
   defaults-path:
     description: 'Path to defaults file in the defaults repository'
     required: false
-    default: '.github/workflow-defaults.yml'
   config-path:
     description: 'Path to local configuration file'
     required: false

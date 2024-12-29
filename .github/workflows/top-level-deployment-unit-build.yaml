@@ -6,11 +6,25 @@ jobs:
     runs-on: arc-runners-prod
     outputs:
       config: ${{ steps.load-config.outputs.config }}
+      dockerFileRepoDir: ${{ steps.load-config.outputs.dockerFileRepoDir }}
+      dockerFileGithubRef: ${{ steps.load-config.outputs.dockerFileGithubRef }}
     steps:
       - uses: actions/checkout@v4.1.7
 
       - id: load-config
         uses: krystof-io/common-workflows/.github/actions/load-config@main
+        with:
+          defaults-path: '.github/workflow-defaults-deployment-unit.yml'
+
+      - name: Set Outputs
+        run: |
+            CONFIG='${{ steps.load-config.outputs.config }}'
+          
+            DOCKER_FILE_REPO_DIR=$(echo "$CONFIG" | jq -r '.dockerFileRepoDir')
+            echo "dockerFileRepoDir=$DOCKER_FILE_REPO_DIR" >> "$GITHUB_OUTPUT"
+            
+            DOCKER_FILE_GITHUB_REF=$(echo "$CONFIG" | jq -r '.dockerFileGithubRef')
+            echo "dockerFileGithubRef=$DOCKER_FILE_GITHUB_REF" >> "$GITHUB_OUTPUT"
 
   build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
@@ -29,6 +43,8 @@ jobs:
     with:
       generic_image_version: ${{ needs.build.outputs.generic_image_version }}
       unique_image_version: ${{ needs.build.outputs.unique_image_version }}
+      dockerfile_tag: ${{ needs.setup.outputs.dockerFileGithubRef }}
+      dockerfile_directory: ${{ needs.setup.outputs.dockerFileRepoDir }}
   sonar-scan:
     needs: build
     uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
