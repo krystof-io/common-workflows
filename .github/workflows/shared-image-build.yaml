@@ -58,8 +58,8 @@ jobs:
 #          password: ${{ env.IMAGE_REGISTRY_PASSWORD }}
 
       - name: Build Docker image
-        run: ls -lRt && docker build \
-          -t ${{ env.IMAGE_REGISTRY_HOST}}/${{github.repository}}:${{ env.UNIQUE_IMAGE_VERSION }} -f ./dockerfile/${{ env.DOCKERFILE_DIRECTORY }}/Dockerfile .
+        run: cp ./dockerfile/${{ env.DOCKERFILE_DIRECTORY }}/Dockerfile . && docker build \
+          -t ${{ env.IMAGE_REGISTRY_HOST}}/${{github.repository}}:${{ env.UNIQUE_IMAGE_VERSION }} .
 
       - name: Push Docker image
         run: docker push ${{ env.IMAGE_REGISTRY_HOST}}/${{github.repository}}:${{ env.UNIQUE_IMAGE_VERSION }}
