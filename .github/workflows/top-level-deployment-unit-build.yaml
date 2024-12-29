@@ -6,8 +6,8 @@ jobs:
     runs-on: arc-runners-prod
     outputs:
       config: ${{ steps.load-config.outputs.config }}
-      dockerFileRepoDir: ${{ steps.load-config.outputs.dockerFileRepoDir }}
-      dockerFileGithubRef: ${{ steps.load-config.outputs.dockerFileGithubRef }}
+      dockerFileRepoDir: ${{ steps.set-outputs.outputs.dockerFileRepoDir }}
+      dockerFileGithubRef: ${{ steps.set-outputs.outputs.dockerFileGithubRef }}
     steps:
       - uses: actions/checkout@v4.1.7
 
@@ -16,14 +16,14 @@ jobs:
         with:
           defaults-path: '.github/workflow-defaults-deployment-unit.yml'
 
-      - name: Set Outputs
+      - id: set-outputs
         run: |
             CONFIG='${{ steps.load-config.outputs.config }}'
           
-            DOCKER_FILE_REPO_DIR=$(echo "$CONFIG" | jq -r '.dockerFileRepoDir')
+            DOCKER_FILE_REPO_DIR=$(echo "$CONFIG" | jq -r '.dockerFileRepoDir // "deployment-unit"')
             echo "dockerFileRepoDir=$DOCKER_FILE_REPO_DIR" >> "$GITHUB_OUTPUT"
             
-            DOCKER_FILE_GITHUB_REF=$(echo "$CONFIG" | jq -r '.dockerFileGithubRef')
+            DOCKER_FILE_GITHUB_REF=$(echo "$CONFIG" | jq -r '.dockerFileGithubRef // "main"')
             echo "dockerFileGithubRef=$DOCKER_FILE_GITHUB_REF" >> "$GITHUB_OUTPUT"
 
   build:
