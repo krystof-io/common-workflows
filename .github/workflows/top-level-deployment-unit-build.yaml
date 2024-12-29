@@ -17,6 +17,7 @@ jobs:
           defaults-path: '.github/workflow-defaults-deployment-unit.yml'
 
       - id: set-outputs
+        name: Set outputs
         run: |
             CONFIG='${{ steps.load-config.outputs.config }}'
           
@@ -25,8 +26,7 @@ jobs:
             
             DOCKER_FILE_GITHUB_REF=$(echo "$CONFIG" | jq -r '.dockerFileGithubRef // "main"')
             echo "dockerFileGithubRef=$DOCKER_FILE_GITHUB_REF" >> "$GITHUB_OUTPUT"
-      - name: Logging env
-        run: printenv
+
   build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
     needs: setup
