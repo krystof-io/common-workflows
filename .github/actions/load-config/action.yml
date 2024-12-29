@@ -79,8 +79,9 @@ runs:
         CONFIG=$(echo "${CONFIG}" | yq eval -o=json -)
         
         # Escape potential newlines and special characters for GitHub Actions
-        CONFIG="${CONFIG//'%'/'%25'}"
-        CONFIG="${CONFIG//$'\n'/'%0A'}"
-        CONFIG="${CONFIG//$'\r'/'%0D'}"
+        #Disabled this for now, unless I for some reason need it.
+        #CONFIG="${CONFIG//'%'/'%25'}"
+        #CONFIG="${CONFIG//$'\n'/'%0A'}"
+        #CONFIG="${CONFIG//$'\r'/'%0D'}"
         
         echo "config=${CONFIG}" >> "$GITHUB_OUTPUT"
