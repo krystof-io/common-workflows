@@ -50,7 +50,7 @@ jobs:
         run: |
           PROJECT_NAME=$(jq -r '.name' package.json)
           echo "project_name=$PROJECT_NAME" >> "$GITHUB_OUTPUT"
-          echo "Project name determined: $PROJECT_NAME" 
+          echo "Project name determined: $PROJECT_NAME" >> $GITHUB_STEP_SUMMARY
 
   image-build:
     uses: krystof-io/common-workflows/.github/workflows/shared-image-build.yaml@main
