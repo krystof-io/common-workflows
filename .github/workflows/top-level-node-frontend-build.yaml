@@ -10,6 +10,7 @@ jobs:
       dockerfile_github_ref: ${{ steps.set-outputs.outputs.dockerfile_github_ref }}
       generic_image_version: ${{ steps.get-version.outputs.generic_image_version }}
       unique_image_version: ${{ steps.get-version.outputs.unique_image_version }}
+      project_name: ${{ steps.get-project-name.outputs.project_name }}
     steps:
       - uses: actions/checkout@v4.1.7
 
@@ -44,6 +45,12 @@ jobs:
           echo "UNIQUE_IMAGE_VERSION=$UNIQUE_IMAGE_VERSION" >> $GITHUB_ENV
           echo "GENERIC_IMAGE_VERSION=$GENERIC_IMAGE_VERSION" >> $GITHUB_ENV
 
+      - id: get-project-name
+        name: Get project name from package.json
+        run: |
+          PROJECT_NAME=$(jq -r '.name' package.json)
+          echo "project_name=$PROJECT_NAME" >> "$GITHUB_OUTPUT"
+
   image-build:
     uses: krystof-io/common-workflows/.github/workflows/shared-image-build.yaml@main
     needs: [setup]
@@ -55,3 +62,12 @@ jobs:
       dockerfile_directory: ${{ needs.setup.outputs.dockerfile_repo_dir }}
       app_type: node
 
+  deploy-dev:
+    if: ${{ github.ref_type == 'branch' || github.ref_type == 'tag' }}
+    uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
+    needs: [build, image-build]
+    secrets: inherit
+    with:
+      target_env: dev
+      target_app_name: ${{ needs.setup.outputs.project_name }}
+      image_version: ${{ needs.setup.outputs.unique_image_version }}
