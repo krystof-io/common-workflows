@@ -8,6 +8,8 @@ jobs:
       config: ${{ steps.load-config.outputs.config }}
       dockerfile_repo_dir: ${{ steps.set-outputs.outputs.dockerfile_repo_dir }}
       dockerfile_github_ref: ${{ steps.set-outputs.outputs.dockerfile_github_ref }}
+      generic_image_version: ${{ steps.get-version.outputs.generic_image_version }}
+      unique_image_version: ${{ steps.get-version.outputs.unique_image_version }}
     steps:
       - uses: actions/checkout@v4.1.7
 
