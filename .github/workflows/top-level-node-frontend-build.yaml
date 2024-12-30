@@ -44,7 +44,7 @@ jobs:
 
   image-build:
     uses: krystof-io/common-workflows/.github/workflows/shared-image-build.yaml@main
-    needs: [setup,build]
+    needs: [setup]
     secrets: inherit
     with:
       generic_image_version: ${{ needs.build.outputs.generic_image_version }}
