@@ -1,0 +1,29 @@
+run-name: Node Frontend Build
+on:
+  workflow_call:
+jobs:
+  setup:
+    runs-on: arc-runners-prod
+    outputs:
+      config: ${{ steps.load-config.outputs.config }}
+      dockerfile_repo_dir: ${{ steps.set-outputs.outputs.dockerfile_repo_dir }}
+      dockerfile_github_ref: ${{ steps.set-outputs.outputs.dockerfile_github_ref }}
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - id: load-config
+        uses: krystof-io/common-workflows/.github/actions/load-config@main
+        with:
+          defaults-path: '.github/workflow-defaults-node-frontend.yml'
+
+      - id: set-outputs
+        name: Set outputs
+        run: |
+            CONFIG='${{ steps.load-config.outputs.config }}'
+          
+            DOCKER_FILE_REPO_DIR=$(echo "$CONFIG" | jq -r '.dockerFileRepoDir // "deployment-unit"')
+            echo "dockerfile_repo_dir=$DOCKER_FILE_REPO_DIR" >> "$GITHUB_OUTPUT"
+            
+            DOCKER_FILE_GITHUB_REF=$(echo "$CONFIG" | jq -r '.dockerFileGithubRef // "main"')
+            echo "dockerfile_github_ref=$DOCKER_FILE_GITHUB_REF" >> "$GITHUB_OUTPUT"
+
