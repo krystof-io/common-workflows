@@ -47,8 +47,8 @@ jobs:
     needs: [setup]
     secrets: inherit
     with:
-      generic_image_version: ${{ needs.build.outputs.generic_image_version }}
-      unique_image_version: ${{ needs.build.outputs.unique_image_version }}
+      generic_image_version: ${{ needs.setup.outputs.generic_image_version }}
+      unique_image_version: ${{ needs.setup.outputs.unique_image_version }}
       dockerfile_tag: ${{ needs.setup.outputs.dockerfile_github_ref }}
       dockerfile_directory: ${{ needs.setup.outputs.dockerfile_repo_dir }}
       app_type: node
