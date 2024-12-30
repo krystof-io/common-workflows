@@ -65,7 +65,7 @@ jobs:
   deploy-dev:
     if: ${{ github.ref_type == 'branch' || github.ref_type == 'tag' }}
     uses: krystof-io/common-workflows/.github/workflows/shared-deploy-app-to-env-fluxcd.yaml@main
-    needs: [build, image-build]
+    needs: [image-build]
     secrets: inherit
     with:
       target_env: dev
