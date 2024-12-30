@@ -11,6 +11,9 @@ on:
         default: 'HEAD'
       dockerfile_directory:
         type: string
+      app_type:
+        type: string
+        default: 'java' # or 'node'
 env:
     IMAGE_REGISTRY_HOST: ${{ vars.IMAGE_REGISTRY_HOST }}
     IMAGE_REGISTRY_USERNAME: ${{ secrets.IMAGE_REGISTRY_USERNAME }}
@@ -19,6 +22,7 @@ env:
     GENERIC_IMAGE_VERSION: ${{ inputs.generic_image_version }}
     DOCKERFILE_TAG: ${{ inputs.dockerfile_tag }}
     DOCKERFILE_DIRECTORY: ${{ inputs.dockerfile_directory }}
+    APP_TYPE: ${{ inputs.app_type }}
 jobs:
   image-build:
     runs-on: arc-runners-prod
@@ -30,7 +34,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.7
 
-      - name: Download build artifact
+      - name: Download java build artifact
+        if: ${{ env.APP_TYPE == 'java' }}
         uses: actions/download-artifact@v4.1.8
         with:
           name: ${{env.UNIQUE_IMAGE_VERSION}}.jar
@@ -59,7 +64,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cp ./dockerfile/${{ env.DOCKERFILE_DIRECTORY }}/Dockerfile .
+          cp ./dockerfile/${{ env.DOCKERFILE_DIRECTORY }}/* .
           docker build -t ${{ env.IMAGE_REGISTRY_HOST}}/${{github.repository}}:${{ env.UNIQUE_IMAGE_VERSION }} .
 
       - name: Push Docker image

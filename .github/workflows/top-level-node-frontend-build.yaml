@@ -27,3 +27,29 @@ jobs:
             DOCKER_FILE_GITHUB_REF=$(echo "$CONFIG" | jq -r '.dockerFileGithubRef // "main"')
             echo "dockerfile_github_ref=$DOCKER_FILE_GITHUB_REF" >> "$GITHUB_OUTPUT"
 
+      - id: get-version
+        name: Get version from package.json
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+                    
+          UNIQUE_IMAGE_VERSION="$VERSION-${GITHUB_SHA::10}"
+          GENERIC_IMAGE_VERSION="$VERSION"
+          echo "Generic Image Version: $GENERIC_IMAGE_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "Unique  Image Version: $UNIQUE_IMAGE_VERSION" >> $GITHUB_STEP_SUMMARY
+          
+          echo "unique_image_version=$UNIQUE_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "generic_image_version=$GENERIC_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "UNIQUE_IMAGE_VERSION=$UNIQUE_IMAGE_VERSION" >> $GITHUB_ENV
+          echo "GENERIC_IMAGE_VERSION=$GENERIC_IMAGE_VERSION" >> $GITHUB_ENV
+
+  image-build:
+    uses: krystof-io/common-workflows/.github/workflows/shared-image-build.yaml@main
+    needs: [setup,build]
+    secrets: inherit
+    with:
+      generic_image_version: ${{ needs.build.outputs.generic_image_version }}
+      unique_image_version: ${{ needs.build.outputs.unique_image_version }}
+      dockerfile_tag: ${{ needs.setup.outputs.dockerfile_github_ref }}
+      dockerfile_directory: ${{ needs.setup.outputs.dockerfile_repo_dir }}
+      app_type: node
+
