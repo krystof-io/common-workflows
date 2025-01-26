@@ -1,0 +1,36 @@
+run-name: Shared Library Build
+on:
+  workflow_call:
+jobs:
+  setup:
+    runs-on: arc-runners-prod
+    outputs:
+      config: ${{ steps.load-config.outputs.config }}
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - id: load-config
+        uses: krystof-io/common-workflows/.github/actions/load-config@main
+        with:
+          defaults-path: '.github/workflow-defaults-shared-library.yml'
+
+      - id: set-outputs
+        name: Set outputs
+        run: |
+            CONFIG='${{ steps.load-config.outputs.config }}'
+
+  build:
+    uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
+    needs: setup
+    secrets: inherit
+  sonar-scan:
+    needs: build
+    uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
+    secrets: inherit
+  maven-deploy:
+    uses: krystof-io/common-workflows/.github/workflows/shared-maven-deploy.yaml@main
+    needs: [ build, sonar-scan ]
+    secrets: inherit
+    with:
+      unique_image_version: ${{ needs.build.outputs.unique_image_version }}
+
