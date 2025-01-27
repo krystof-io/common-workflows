@@ -1,4 +1,4 @@
-run-name: Shared Library Build
+run-name: Shared Library Tag
 on:
   workflow_call:
 jobs:
@@ -18,11 +18,11 @@ jobs:
         name: Set outputs
         run: |
             CONFIG='${{ steps.load-config.outputs.config }}'
+  sonar-scan:
+    needs: setup
+    uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
+    secrets: inherit
   build:
     uses: krystof-io/common-workflows/.github/workflows/shared-maven-build.yaml@main
-    needs: setup
-    secrets: inherit
-  sonar-scan:
     needs: build
-    uses: krystof-io/common-workflows/.github/workflows/shared-sonar-scan.yaml@main
     secrets: inherit
