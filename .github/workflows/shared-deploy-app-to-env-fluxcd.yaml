@@ -40,6 +40,8 @@ jobs:
           RETRY_DELAY=2
           
           cd flux/kio-apps/prod-${{env.TARGET_ENV}}/${{env.TARGET_APP_NAME}}
+          
+          pwd
                     
           git config --global user.email "${{env.CICD_USER_EMAIL}}"
           git config --global user.name "${{env.CICD_USER_NAME}}"
