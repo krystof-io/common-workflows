@@ -125,10 +125,9 @@ jobs:
 
       - name: Maven Build And Deploy
         run: >
-          mvn -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
+          mvn -X -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
             -DaltSnapshotDeploymentRepository=private-snapshots::default::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
-            -DaltReleaseDeploymentRepository=private-releases::default::${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}} \
-            -DupdateSnapshots=true
+            -DaltReleaseDeploymentRepository=private-releases::default::${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}} 
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
