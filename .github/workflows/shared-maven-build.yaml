@@ -61,7 +61,9 @@ jobs:
         id: check_snapshots
         run: |
           # Check if project version is SNAPSHOT
-          PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout \
+            -DaltSnapshotDeploymentRepository=private-snapshots::default::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
+            -DaltReleaseDeploymentRepository=private-releases::default::${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}})
           if [[ $PROJECT_VERSION == *-SNAPSHOT ]]; then
             echo "is_snapshot=true" >> "$GITHUB_OUTPUT"
             echo "This build is a *SNAPSHOT*" >> $GITHUB_STEP_SUMMARY
