@@ -126,7 +126,10 @@ jobs:
         run: >
           mvn -X -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
             -DaltSnapshotDeploymentRepository=private-snapshots::default::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
-            -DaltReleaseDeploymentRepository=private-releases::default::${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}}
+            -DaltReleaseDeploymentRepository=private-releases::default::${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}} \
+            -Drepo.snapshot.url=${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
+            -Drepo.release.url=${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}} \
+            --no-transfer-progress
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
