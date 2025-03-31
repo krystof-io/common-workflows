@@ -56,6 +56,7 @@ jobs:
             [
             {"id": "nexus", "name":"nexus", "mirrorOf":"*", "url":"${{ env.MAVEN_REPO_URL }}"}
             ]
+          sonatypeSnapshots: true
 
       - name: Check for SNAPSHOT dependencies
         id: check_snapshots
