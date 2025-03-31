@@ -62,7 +62,7 @@ jobs:
         id: check_snapshots
         run: |
           ls -la .
-          ls -la ./usr/local/maven
+          ls -la /usr/local/maven
           mvn -version -X
           # Check if project version is SNAPSHOT
           PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout \
