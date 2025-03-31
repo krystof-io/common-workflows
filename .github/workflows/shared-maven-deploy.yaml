@@ -34,6 +34,7 @@ jobs:
 
       - name: Maven Repo Deploy
         run: >
+          cat ./.m2/settings.xml
           mvn -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
             -DskipTests=true \
             -DaltSnapshotDeploymentRepository=private-snapshots::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
