@@ -56,7 +56,6 @@ jobs:
             [
             {"id": "nexus", "name":"nexus", "mirrorOf":"*", "url":"${{ env.MAVEN_REPO_URL }}"}
             ]
-          sonatypeSnapshots: true
 
       - name: Check for SNAPSHOT dependencies
         id: check_snapshots
@@ -125,7 +124,7 @@ jobs:
 
       - name: Maven Build And Deploy
         run: >
-          mvn -X -U -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
+          mvn -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
             -DaltSnapshotDeploymentRepository=private-snapshots::default::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
             -DaltReleaseDeploymentRepository=private-releases::default::${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}} \
             -DupdateSnapshots=true
