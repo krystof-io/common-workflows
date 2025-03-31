@@ -61,6 +61,8 @@ jobs:
       - name: Check for SNAPSHOT dependencies
         id: check_snapshots
         run: |
+          cat ./.m2/settings.xml
+          ls -l .
           # Check if project version is SNAPSHOT
           PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout \
             -DaltSnapshotDeploymentRepository=private-snapshots::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
