@@ -61,9 +61,7 @@ jobs:
       - name: Check for SNAPSHOT dependencies
         id: check_snapshots
         run: |
-          ls -la .
-          ls -la /usr/local/maven
-          mvn -version -X
+          mvn -X clean
           # Check if project version is SNAPSHOT
           PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout \
             -DaltSnapshotDeploymentRepository=private-snapshots::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
