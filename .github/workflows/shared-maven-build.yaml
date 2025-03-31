@@ -61,7 +61,6 @@ jobs:
       - name: Check for SNAPSHOT dependencies
         id: check_snapshots
         run: |
-          mvn -U dependency:tree
           # Check if project version is SNAPSHOT
           PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout \
             -DaltSnapshotDeploymentRepository=private-snapshots::default::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
@@ -126,7 +125,7 @@ jobs:
 
       - name: Maven Build And Deploy
         run: >
-          mvn -U -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
+          mvn -f pom.xml clean deploy -Dcontainer.image.version=${{env.UNIQUE_IMAGE_VERSION}} \
             -DaltSnapshotDeploymentRepository=private-snapshots::default::${{env.MAVEN_PRIVATE_SNAPSHOT_REPO_URL}} \
             -DaltReleaseDeploymentRepository=private-releases::default::${{env.MAVEN_PRIVATE_RELEASE_REPO_URL}} 
 
